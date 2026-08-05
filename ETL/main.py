@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import pdfplumber
 from readers.pdf_reader import PDFReader
 
 load_dotenv()
@@ -22,6 +23,18 @@ def main():
     print(paginas)
 
     reader.read_page(paginas[0])
+
+    with pdfplumber.open(PDF_PATH) as pdf:
+
+        reader = PDFReader(PDF_PATH)
+
+        paginas = reader.locate_pages()
+
+        for pagina in paginas:
+
+            dados = reader.read_page(pagina)
+
+            print(dados)
 
 if __name__ == "__main__":
     main()

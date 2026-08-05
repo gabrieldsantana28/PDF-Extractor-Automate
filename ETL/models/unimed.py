@@ -4,15 +4,20 @@ from dataclasses import dataclass
 @dataclass
 class Unimed:
 
-    cd_unimed: int
-    ds_unimed: str
-    cd_ans: int
-    ds_regiao: str
-    ds_estado: str
-    ds_municipio: str
-    tp_cooperativa: str
-
-    qtd_beneficiarios: int
-    qtd_colaboradores: int
-    qtd_medicos: int
-    ds_porte: str
+    def __init__(
+            self,
+            ds_nome_unimed,
+            cd_unimed,
+            cd_ans,
+            ds_municipio,
+            ds_estado,
+            ds_regiao,
+            ds_tipo_cooperativa
+    ):
+        self.ds_nome_unimed = ds_nome_unimed
+        self.cd_unimed = cd_unimed
+        self.cd_ans = cd_ans
+        self.ds_municipio = ds_municipio
+        self.ds_estado = ds_estado
+        self.ds_regiao = ds_regiao
+        self.ds_tipo_cooperativa = ds_tipo_cooperativa
