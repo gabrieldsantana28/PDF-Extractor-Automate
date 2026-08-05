@@ -1,0 +1,10 @@
+pymupdf
+
+camelot-py
+opencv-python
+matplotlib
+ghostscript
+pandas
+psycopg2-binary
+sqlalchemy
+unidecode
