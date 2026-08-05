@@ -21,6 +21,7 @@ def main():
     print("Páginas iniciais encontradas:")
     print(paginas)
 
+    reader.read_page(paginas[0])
 
 if __name__ == "__main__":
     main()
