@@ -1,11 +1,11 @@
 import os
+import pandas as pd
 from dotenv import load_dotenv
-import pdfplumber
 from readers.pdf_reader import PDFReader
 
 load_dotenv()
 
-FILE_NAME = os.getenv("FILE_NAME_2026T1")
+FILE_NAME = os.getenv("FILE_NAME_2025T4")
 
 PDF_PATH = os.path.abspath(
     f"ETL/{os.getenv('FILE_PATH')}{FILE_NAME}.pdf"
@@ -18,23 +18,39 @@ def main():
 
     paginas = reader.locate_pages()
 
+    dados_unimeds = []
+
+    for pagina in paginas:
+
+        dados = reader.read_page(pagina)
+
+        dados_unimeds.append(dados)
+
     print()
-    print("Páginas iniciais encontradas:")
-    print(paginas)
+    print("=" * 50)
+    print(f"TOTAL DE UNIMEDS EXTRAÍDAS: {len(dados_unimeds)}")
+    print("=" * 50)
 
-    reader.read_page(paginas[0])
+    # Transformando os dados em DataFrame
+    df = pd.DataFrame(dados_unimeds)
 
-    with pdfplumber.open(PDF_PATH) as pdf:
+    print()
 
-        reader = PDFReader(PDF_PATH)
+    output_path = os.path.abspath(
+        f"ETL/files/output/{FILE_NAME}.xlsx"
+    )
 
-        paginas = reader.locate_pages()
+    df.to_excel(
+        output_path,
+        index=False
+    )
 
-        for pagina in paginas:
+    print()
+    print("=" * 50)
+    print("EXCEL GERADO COM SUCESSO")
+    print("=" * 50)
+    print(output_path)
 
-            dados = reader.read_page(pagina)
-
-            print(dados)
 
 if __name__ == "__main__":
     main()

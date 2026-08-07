@@ -23,7 +23,7 @@ class PDFReader:
                 if texto is None:
                     continue
 
-                if texto.startswith("RECA"):
+                if texto.startswith("RELATÓRIO DE EVENTOS") or texto.startswith("RECA"):
                     paginas_unimed.append(indice+1)
                     print(f"Página {indice + 1} encontrada.")
 
