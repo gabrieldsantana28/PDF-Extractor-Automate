@@ -18,7 +18,7 @@ def main():
 
     paginas = reader.locate_pages()
 
-    dados = reader.read_page(paginas[0])
+    dados = reader.read_page(paginas[1])
 
     print()
     print("=" * 50)

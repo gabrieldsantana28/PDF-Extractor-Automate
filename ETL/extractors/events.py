@@ -3,6 +3,25 @@ import re
 
 class EventsExtractor:
 
+    CATEGORIAS_EVENTOS = [
+        "Consultas (Amb+PS)",
+        "Outros Atend. Amb.",
+        "Exames",
+        "Terapias",
+        "Internações",
+        "Total Eventos"
+    ]
+
+    CATEGORIAS_DESPESAS = [
+        "Consultas (Amb+PS)",
+        "Outros Atend. Amb.",
+        "Exames",
+        "Terapias",
+        "Internações",
+        "Demais Desp Amb e Hosp",
+        "Total Despesas Assistenciais R$"
+    ]
+
     def extract(self, texto):
 
         linhas = [
@@ -18,87 +37,99 @@ class EventsExtractor:
 
         for linha in linhas:
 
-            # ==============================
             # INÍCIO DA TABELA DE EVENTOS
-            # ==============================
             if linha.startswith("Tipo de evento"):
                 modo = "eventos"
                 continue
 
-            # ==============================
             # INÍCIO DA TABELA DE DESPESAS
-            # ==============================
             if linha.startswith("Tipo da despesa"):
                 modo = "despesas"
                 continue
 
-            # ==============================
             # FIM DAS TABELAS
-            # ==============================
             if linha.startswith("Comparativo dos Indicadores"):
                 modo = None
                 continue
 
-            if linha.startswith("FONTE:"):
-                continue
-
-            # ==============================
-            # IGNORA LINHAS QUE NÃO SÃO DADOS
-            # ==============================
             if modo is None:
                 continue
 
-            # Ignora percentuais isolados dos gráficos
-            if re.fullmatch(r"[\d,]+%", linha):
+            # IGNORA FONTE
+            if linha.startswith("FONTE:"):
                 continue
 
-            # ==============================
-            # EXTRAI LINHA
-            # ==============================
-            dados = self._extract_linha(linha)
-
-            if dados is None:
-                continue
-
+            # EXTRAI EVENTOS
             if modo == "eventos":
-                eventos.append(dados)
 
+                dados = self._extract_linha(
+                    linha,
+                    self.CATEGORIAS_EVENTOS
+                )
+
+                if dados:
+                    eventos.append(dados)
+
+            # EXTRAI DESPESAS
             elif modo == "despesas":
-                despesas.append(dados)
+
+                dados = self._extract_linha(
+                    linha,
+                    self.CATEGORIAS_DESPESAS
+                )
+
+                if dados:
+                    despesas.append(dados)
 
         return {
             "eventos": eventos,
             "despesas": despesas
         }
 
-    def _extract_linha(self, linha):
+    def _extract_linha(self, linha, categorias):
 
-        # Procura todos os números da linha
-        numeros = re.findall(
-            r"\d[\d.]*,\d+|\d[\d.]*",
-            linha
-        )
+        categoria = None
+        restante = None
 
-        if len(numeros) < 6:
+        for nome_categoria in categorias:
+
+            if linha.startswith(nome_categoria):
+
+                categoria = nome_categoria
+
+                restante = linha[len(nome_categoria):].strip()
+
+                break
+
+        if categoria is None:
             return None
 
-        # Os últimos 6 valores são:
+
+
+        numeros = re.findall(
+            r"\d[\d.]*,\d+|\d[\d.]*",
+            restante
+        )
+
+        # Precisamos de:
+        #
         # período 1
         # período 2
         # período 3
         # período 4
         # total
         # percentual
+        #
+        # Os números posteriores pertencem
+        # aos gráficos e serão ignorados.
 
-        valores = numeros[-6:]
-
-        descricao = linha[:linha.find(valores[0])].strip()
-
-        if not descricao:
+        if len(numeros) < 6:
             return None
 
+        valores = numeros[:6]
+
         return {
-            "descricao": descricao,
+            "descricao": categoria,
             "valor_periodo_1": valores[0],
             "valor_periodo_2": valores[1],
             "valor_periodo_3": valores[2],
