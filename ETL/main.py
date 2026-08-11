@@ -3,6 +3,9 @@ import pandas as pd
 from dotenv import load_dotenv
 from readers.pdf_reader import PDFReader
 
+from extractors.events import EventsExtractor
+from transformers.events import EventsTransformer
+
 load_dotenv()
 
 FILE_NAME = os.getenv("FILE_NAME_2025T4")

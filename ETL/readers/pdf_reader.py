@@ -65,6 +65,14 @@ class PDFReader:
                 "despesas": dados_eventos["despesas"]
             }
 
+    def get_page_text(self, page_index):
+
+        with pdfplumber.open(self.pdf_path) as pdf:
+
+            pagina = pdf.pages[page_index - 1]
+
+            return pagina.extract_text()
+
     def extract_header(self, pagina):
         text = pagina.extract_text()
 
