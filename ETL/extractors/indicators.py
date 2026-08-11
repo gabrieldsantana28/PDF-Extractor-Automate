@@ -35,17 +35,9 @@ class IndicatorsExtractor:
 
         for linha in linhas:
 
-            # ==========================================
-            # INÍCIO DO BLOCO
-            # ==========================================
-
             if linha.startswith("Comparativo dos Indicadores Assistenciais"):
                 dentro_bloco = True
                 continue
-
-            # ==========================================
-            # FIM DO BLOCO
-            # ==========================================
 
             if dentro_bloco and linha.startswith("FONTE:"):
                 break
@@ -53,20 +45,12 @@ class IndicatorsExtractor:
             if not dentro_bloco:
                 continue
 
-            # ==========================================
-            # IDENTIFICA CATEGORIA
-            # ==========================================
-
             if linha in self.CATEGORIAS:
                 categoria_atual = linha
                 continue
 
             if categoria_atual is None:
                 continue
-
-            # ==========================================
-            # IDENTIFICA INDICADOR
-            # ==========================================
 
             indicador_encontrado = None
 
@@ -79,15 +63,7 @@ class IndicatorsExtractor:
             if indicador_encontrado is None:
                 continue
 
-            # ==========================================
-            # REMOVE TEXTO DO INDICADOR
-            # ==========================================
-
             restante = linha[len(indicador_encontrado):].strip()
-
-            # ==========================================
-            # EXTRAI VALORES
-            # ==========================================
 
             valores = re.findall(
                 r"-?\d[\d.]*,\d+%?|-?\d+%?",
