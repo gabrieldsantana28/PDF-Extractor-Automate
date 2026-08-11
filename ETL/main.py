@@ -20,77 +20,84 @@ PDF_PATH = os.path.abspath(
 
 def main():
 
-    # ==========================================
-    # PDF READER
-    # ==========================================
+    
+    # # ==========================================
+    # # PDF READER
+    # # ==========================================
 
     reader = PDFReader(PDF_PATH)
 
     paginas = reader.locate_pages()
 
-    print()
-    print("=" * 50)
-    print("PÁGINAS ENCONTRADAS")
-    print("=" * 50)
-    print(paginas)
-
-
-    # ==========================================
-    # TEXTO DA PÁGINA
-    # ==========================================
-
-    texto = reader.get_page_text(paginas[0])
-
-
-    # ==========================================
-    # HEADER
-    # ==========================================
-
-    header_extractor = HeaderExtractor()
-
-    header = header_extractor.extract(texto)
-
-    print()
-    print("=" * 50)
-    print("HEADER")
-    print("=" * 50)
-    print(header)
-
-
-    # ==========================================
-    # EVENTS EXTRACTOR
-    # ==========================================
-
-    events_extractor = EventsExtractor()
-
-    dados_eventos = events_extractor.extract(texto)
-
-    print()
-    print("=" * 50)
-    print("DADOS EXTRAÍDOS")
-    print("=" * 50)
-
-    print(dados_eventos)
-
-
-    # ==========================================
-    # EVENTS TRANSFORMER
-    # ==========================================
-
-    events_transformer = EventsTransformer()
-
-    dados_tf_eventos = events_transformer.transform(
-        dados_eventos,
-        header
+    texto_pagina_2 = reader.get_page_text(
+        paginas[0]
     )
 
-    print()
-    print("=" * 50)
-    print("DADOS TRANSFORMADOS")
-    print("=" * 50)
+    print(texto_pagina_2)
 
-    for linha in dados_tf_eventos:
-        print(linha)
+    # print()
+    # print("=" * 50)
+    # print("PÁGINAS ENCONTRADAS")
+    # print("=" * 50)
+    # print(paginas)
+
+
+    # # ==========================================
+    # # TEXTO DA PÁGINA
+    # # ==========================================
+
+    # texto = reader.get_page_text(paginas[0])
+
+
+    # # ==========================================
+    # # HEADER
+    # # ==========================================
+
+    # header_extractor = HeaderExtractor()
+
+    # header = header_extractor.extract(texto)
+
+    # print()
+    # print("=" * 50)
+    # print("HEADER")
+    # print("=" * 50)
+    # print(header)
+
+
+    # # ==========================================
+    # # EVENTS EXTRACTOR
+    # # ==========================================
+
+    # events_extractor = EventsExtractor()
+
+    # dados_eventos = events_extractor.extract(texto)
+
+    # print()
+    # print("=" * 50)
+    # print("DADOS EXTRAÍDOS")
+    # print("=" * 50)
+
+    # print(dados_eventos)
+
+
+    # # ==========================================
+    # # EVENTS TRANSFORMER
+    # # ==========================================
+
+    # events_transformer = EventsTransformer()
+
+    # dados_tf_eventos = events_transformer.transform(
+    #     dados_eventos,
+    #     header
+    # )
+
+    # print()
+    # print("=" * 50)
+    # print("DADOS TRANSFORMADOS")
+    # print("=" * 50)
+
+    # for linha in dados_tf_eventos:
+    #     print(linha)
 
 
 if __name__ == "__main__":
