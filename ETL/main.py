@@ -18,38 +18,45 @@ def main():
 
     paginas = reader.locate_pages()
 
-    dados_unimeds = []
-
-    for pagina in paginas:
-
-        dados = reader.read_page(pagina)
-
-        dados_unimeds.append(dados)
+    dados = reader.read_page(paginas[0])
 
     print()
     print("=" * 50)
-    print(f"TOTAL DE UNIMEDS EXTRAÍDAS: {len(dados_unimeds)}")
+    print("HEADER")
     print("=" * 50)
 
-    # Transformando os dados em DataFrame
-    df = pd.DataFrame(dados_unimeds)
-
-    print()
-
-    output_path = os.path.abspath(
-        f"ETL/files/output/{FILE_NAME}.xlsx"
-    )
-
-    df.to_excel(
-        output_path,
-        index=False
-    )
+    print(dados["header"])
 
     print()
     print("=" * 50)
-    print("EXCEL GERADO COM SUCESSO")
+    print("EVENTOS")
     print("=" * 50)
-    print(output_path)
+
+    for evento in dados["eventos"]:
+        print(evento)
+
+    print()
+    print("=" * 50)
+    print("DESPESAS")
+    print("=" * 50)
+
+    for despesa in dados["despesas"]:
+        print(despesa)
+
+    # output_path = os.path.abspath(
+    #     f"ETL/files/output/{FILE_NAME}.xlsx"
+    # )
+
+    # df.to_excel(
+    #     output_path,
+    #     index=False
+    # )
+
+    # print()
+    # print("=" * 50)
+    # print("EXCEL GERADO COM SUCESSO")
+    # print("=" * 50)
+    # print(output_path)
 
 
 if __name__ == "__main__":

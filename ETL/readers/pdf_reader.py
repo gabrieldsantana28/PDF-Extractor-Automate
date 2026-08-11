@@ -1,6 +1,8 @@
 import pdfplumber
 
+
 from extractors.header import HeaderExtractor
+from extractors.events import EventsExtractor
 
 class PDFReader:
 
@@ -37,11 +39,31 @@ class PDFReader:
 
             texto = pagina.extract_text()
 
-            extractor = HeaderExtractor()
+            # ==============================
+            # HEADER
+            # ==============================
 
-            dados = extractor.extract(texto)
+            header_extractor = HeaderExtractor()
 
-            return dados
+            dados_header = header_extractor.extract(texto)
+
+            # ==============================
+            # EVENTOS E DESPESAS
+            # ==============================
+
+            eventos_extractor = EventsExtractor()
+
+            dados_eventos = eventos_extractor.extract(texto)
+
+            # ==============================
+            # RESULTADO
+            # ==============================
+
+            return {
+                "header": dados_header,
+                "eventos": dados_eventos["eventos"],
+                "despesas": dados_eventos["despesas"]
+            }
 
     def extract_header(self, pagina):
         text = pagina.extract_text()
