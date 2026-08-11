@@ -1,10 +1,13 @@
 import os
 import pandas as pd
-from dotenv import load_dotenv
-from readers.pdf_reader import PDFReader
 
+from dotenv import load_dotenv
+
+from readers.pdf_reader import PDFReader
+from extractors.header import HeaderExtractor
 from extractors.events import EventsExtractor
 from transformers.events import EventsTransformer
+
 
 load_dotenv()
 
@@ -17,49 +20,77 @@ PDF_PATH = os.path.abspath(
 
 def main():
 
+    # ==========================================
+    # PDF READER
+    # ==========================================
+
     reader = PDFReader(PDF_PATH)
 
     paginas = reader.locate_pages()
 
-    dados = reader.read_page(paginas[1])
+    print()
+    print("=" * 50)
+    print("PÁGINAS ENCONTRADAS")
+    print("=" * 50)
+    print(paginas)
+
+
+    # ==========================================
+    # TEXTO DA PÁGINA
+    # ==========================================
+
+    texto = reader.get_page_text(paginas[0])
+
+
+    # ==========================================
+    # HEADER
+    # ==========================================
+
+    header_extractor = HeaderExtractor()
+
+    header = header_extractor.extract(texto)
 
     print()
     print("=" * 50)
     print("HEADER")
     print("=" * 50)
+    print(header)
 
-    print(dados["header"])
+
+    # ==========================================
+    # EVENTS EXTRACTOR
+    # ==========================================
+
+    events_extractor = EventsExtractor()
+
+    dados_eventos = events_extractor.extract(texto)
 
     print()
     print("=" * 50)
-    print("EVENTOS")
+    print("DADOS EXTRAÍDOS")
     print("=" * 50)
 
-    for evento in dados["eventos"]:
-        print(evento)
+    print(dados_eventos)
+
+
+    # ==========================================
+    # EVENTS TRANSFORMER
+    # ==========================================
+
+    events_transformer = EventsTransformer()
+
+    dados_tf_eventos = events_transformer.transform(
+        dados_eventos,
+        header
+    )
 
     print()
     print("=" * 50)
-    print("DESPESAS")
+    print("DADOS TRANSFORMADOS")
     print("=" * 50)
 
-    for despesa in dados["despesas"]:
-        print(despesa)
-
-    # output_path = os.path.abspath(
-    #     f"ETL/files/output/{FILE_NAME}.xlsx"
-    # )
-
-    # df.to_excel(
-    #     output_path,
-    #     index=False
-    # )
-
-    # print()
-    # print("=" * 50)
-    # print("EXCEL GERADO COM SUCESSO")
-    # print("=" * 50)
-    # print(output_path)
+    for linha in dados_tf_eventos:
+        print(linha)
 
 
 if __name__ == "__main__":

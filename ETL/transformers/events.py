@@ -48,7 +48,7 @@ class EventsTransformer:
             resultado.append({
                 "cd_unimed": header["codigo_unimed"],
                 "cd_periodo": cd_periodo,
-                "cd_categoria": categoria,
+                "cd_categoria": evento["descricao"],
                 "tp_medida": "EVENTOS",
                 "valor": valor
             })
@@ -73,7 +73,7 @@ class EventsTransformer:
             resultado.append({
                 "cd_unimed": header["codigo_unimed"],
                 "cd_periodo": cd_periodo,
-                "cd_categoria": categoria,
+                "cd_categoria": despesa["descricao"],
                 "tp_medida": "DESPESA",
                 "valor": valor
             })
