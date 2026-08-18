@@ -5,6 +5,7 @@ opencv-python
 matplotlib
 ghostscript
 pandas
+openpyxl
 psycopg2-binary
 sqlalchemy
 unidecode

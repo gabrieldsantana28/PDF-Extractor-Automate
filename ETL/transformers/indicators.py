@@ -98,6 +98,10 @@ class IndicatorsTransformer:
             return None
 
         valor = str(valor).strip()
+
+        if valor in {"-", "#VALOR!", ""}:
+            return None
+
         percentual = valor.endswith("%")
 
         valor = valor.removesuffix("%")

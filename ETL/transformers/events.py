@@ -28,10 +28,7 @@ class EventsTransformer:
 
         resultado = []
 
-        # ==========================================
         # EVENTOS
-        # ==========================================
-
         for evento in dados["eventos"]:
 
             categoria = self.CATEGORIAS_EVENTOS.get(
@@ -53,10 +50,7 @@ class EventsTransformer:
                 "valor": valor
             })
 
-        # ==========================================
         # DESPESAS
-        # ==========================================
-
         for despesa in dados["despesas"]:
 
             categoria = self.CATEGORIAS_DESPESAS.get(
@@ -104,10 +98,8 @@ class EventsTransformer:
 
         valor = str(valor).strip()
 
-        # Remove separador de milhar
         valor = valor.replace(".", "")
 
-        # Converte decimal brasileiro
         valor = valor.replace(",", ".")
 
         return float(valor)

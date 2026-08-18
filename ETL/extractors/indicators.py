@@ -66,7 +66,7 @@ class IndicatorsExtractor:
             restante = linha[len(indicador_encontrado):].strip()
 
             valores = re.findall(
-                r"-?\d[\d.]*,\d+%?|-?\d+%?",
+                r"#VALOR!|-?\d[\d.]*,\d+%?|-?\d+%?|(?<!\S)-(?!\S)",
                 restante
             )
 
