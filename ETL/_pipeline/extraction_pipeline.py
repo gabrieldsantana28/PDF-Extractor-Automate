@@ -1,15 +1,17 @@
 # EXTRACTORS
-from ETL._extractors.events import EventsExtractor
-from ETL._extractors.expenses import ExpensesExtractor
-from ETL._extractors.header import HeaderExtractor
-from ETL._extractors.hospitalizations import HospitalizationsExtractor
-from ETL._extractors.indicators import IndicatorsExtractor
+from _extractors.charts import ChartsExtractor
+from _extractors.events import EventsExtractor
+from _extractors.expenses import ExpensesExtractor
+from _extractors.header import HeaderExtractor
+from _extractors.hospitalizations import HospitalizationsExtractor
+from _extractors.indicators import IndicatorsExtractor
 
 # TRANSFORMERS
-from ETL._transformers.events import EventsTransformer
-from ETL._transformers.expenses import ExpensesTransformer
-from ETL._transformers.hospitalizations import HospitalizationsTransformer
-from ETL._transformers.indicators import IndicatorsTransformer
+from _transformers.charts import ChartsTransformer
+from _transformers.events import EventsTransformer
+from _transformers.expenses import ExpensesTransformer
+from _transformers.hospitalizations import HospitalizationsTransformer
+from _transformers.indicators import IndicatorsTransformer
 
 class ExtractionPipeline:
 
@@ -18,11 +20,13 @@ class ExtractionPipeline:
 
         self.header_extractor = HeaderExtractor()
         self.events_extractor = EventsExtractor()
+        self.charts_extractor = ChartsExtractor()
         self.expenses_extractor = ExpensesExtractor()
         self.indicators_extractor = IndicatorsExtractor()
         self.hospitalizations_extractor = HospitalizationsExtractor()
 
         self.events_transformer = EventsTransformer()
+        self.charts_transformer = ChartsTransformer()
         self.expenses_transformer = ExpensesTransformer()
         self.indicators_transformer = IndicatorsTransformer()
         self.hospitalizations_transformer = HospitalizationsTransformer()
@@ -34,6 +38,7 @@ class ExtractionPipeline:
         indicadores_assistenciais = []
         internacoes = []
         despesas_assistenciais = []
+        indicadores_graficos = []
 
         for pagina in paginas:
 
@@ -62,6 +67,27 @@ class ExtractionPipeline:
                 self.hospitalizations_extractor.extract(
                     texto_internacoes
                 )
+            )
+
+            regioes_graficos = {
+                "consultas": self.reader.get_page_region_words(
+                    page_index=pagina + 1,
+                    start_text="Consultas Médicas Totais",
+                    end_text="Exames Médicos"
+                ),
+                "exames": self.reader.get_page_region_words(
+                    page_index=pagina + 1,
+                    start_text="Exames Médicos",
+                    end_text="Terapias e Outros Atendimentos"
+                ),
+                "terapias": self.reader.get_page_region_words(
+                    page_index=pagina + 1,
+                    start_text="Terapias e Outros Atendimentos"
+                )
+            }
+
+            dados_graficos = self.charts_extractor.extract(
+                regioes_graficos
             )
 
             dados_cadastrais.append(header)
@@ -94,10 +120,18 @@ class ExtractionPipeline:
                 )
             )
 
+            indicadores_graficos.extend(
+                self.charts_transformer.transform(
+                    dados_graficos,
+                    header
+                )
+            )
+
         return {
             "dados_cadastrais": dados_cadastrais,
             "eventos_despesas": eventos_despesas,
             "indicadores_assistenciais": indicadores_assistenciais,
             "internacoes": internacoes,
-            "despesas_assistenciais": despesas_assistenciais
+            "despesas_assistenciais": despesas_assistenciais,
+            "indicadores_graficos": indicadores_graficos
         }

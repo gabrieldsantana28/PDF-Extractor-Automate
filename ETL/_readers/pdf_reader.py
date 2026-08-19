@@ -103,3 +103,75 @@ class PDFReader:
                 x_tolerance=2,
                 y_tolerance=3
             )
+
+    def get_page_region_words(
+        self,
+        page_index,
+        start_text,
+        end_text=None,
+        top_padding=2,
+        bottom_padding=2
+    ):
+
+        with pdfplumber.open(self.pdf_path) as pdf:
+
+            pagina = pdf.pages[page_index - 1]
+
+            inicios = pagina.search(start_text, regex=False)
+
+            if not inicios:
+                raise ValueError(
+                    f"Texto inicial não encontrado na página "
+                    f"{page_index}: {start_text}"
+                )
+
+            inicio = min(
+                inicios,
+                key=lambda ocorrencia: ocorrencia["top"]
+            )
+
+            top = min(
+                inicio["bottom"] + top_padding,
+                pagina.height
+            )
+
+            if end_text:
+
+                finais = [
+                    ocorrencia
+                    for ocorrencia in pagina.search(end_text, regex=False)
+                    if ocorrencia["top"] > inicio["top"]
+                ]
+
+                if not finais:
+                    raise ValueError(
+                        f"Texto final não encontrado na página "
+                        f"{page_index}: {end_text}"
+                    )
+
+                fim = min(
+                    finais,
+                    key=lambda ocorrencia: ocorrencia["top"]
+                )
+
+                bottom = max(
+                    fim["top"] - bottom_padding,
+                    top
+                )
+
+            else:
+                bottom = pagina.height
+
+            regiao = pagina.crop(
+                (0, top, pagina.width, bottom)
+            )
+
+            return {
+                "page_width": pagina.width,
+                "top": top,
+                "bottom": bottom,
+                "words": regiao.extract_words(
+                    x_tolerance=1,
+                    y_tolerance=2
+                )
+            }
