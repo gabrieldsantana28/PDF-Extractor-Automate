@@ -104,24 +104,10 @@ class EventsExtractor:
         if categoria is None:
             return None
 
-
-
         numeros = re.findall(
             r"\d[\d.]*,\d+|\d[\d.]*",
             restante
         )
-
-        # Precisamos de:
-        #
-        # período 1
-        # período 2
-        # período 3
-        # período 4
-        # total
-        # percentual
-        #
-        # Os números posteriores pertencem
-        # aos gráficos e serão ignorados.
 
         if len(numeros) < 6:
             return None

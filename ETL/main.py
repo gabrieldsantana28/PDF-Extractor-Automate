@@ -2,21 +2,6 @@
 import os
 import pandas as pd
 from dotenv import load_dotenv
-from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.utils import get_column_letter
-
-# EXTRACTORS
-from _extractors.expenses import ExpensesExtractor
-from _extractors.events import EventsExtractor
-from _extractors.header import HeaderExtractor
-from _extractors.hospitalizations import HospitalizationsExtractor
-from _extractors.indicators import IndicatorsExtractor
-
-# TRANSFORMERS
-from _transformers.events import EventsTransformer
-from _transformers.expenses import ExpensesTransformer
-from _transformers.hospitalizations import HospitalizationsTransformer
-from _transformers.indicators import IndicatorsTransformer
 
 from _readers.pdf_reader import PDFReader
 from _exporters.excel_exporter import export_to_excel
@@ -28,7 +13,7 @@ load_dotenv()
 def main():
 
     FILE_NAME, PDF_PATH, OUTPUT_PATH = build_paths(
-        "FILE_NAME_2025T4_RS"
+        "FILE_NAME_2026T1_SC"
     )
 
     reader = PDFReader(PDF_PATH)

@@ -5,6 +5,7 @@ from _extractors.expenses import ExpensesExtractor
 from _extractors.header import HeaderExtractor
 from _extractors.hospitalizations import HospitalizationsExtractor
 from _extractors.indicators import IndicatorsExtractor
+from _extractors.ticket_cost import TicketCostExtractor
 
 # TRANSFORMERS
 from _transformers.charts import ChartsTransformer
@@ -12,6 +13,7 @@ from _transformers.events import EventsTransformer
 from _transformers.expenses import ExpensesTransformer
 from _transformers.hospitalizations import HospitalizationsTransformer
 from _transformers.indicators import IndicatorsTransformer
+from _transformers.ticket_cost import TicketCostTransformer
 
 class ExtractionPipeline:
 
@@ -24,12 +26,14 @@ class ExtractionPipeline:
         self.expenses_extractor = ExpensesExtractor()
         self.indicators_extractor = IndicatorsExtractor()
         self.hospitalizations_extractor = HospitalizationsExtractor()
+        self.ticket_cost_extractor = TicketCostExtractor()
 
         self.events_transformer = EventsTransformer()
         self.charts_transformer = ChartsTransformer()
         self.expenses_transformer = ExpensesTransformer()
         self.indicators_transformer = IndicatorsTransformer()
         self.hospitalizations_transformer = HospitalizationsTransformer()
+        self.ticket_cost_transformer = TicketCostTransformer()
 
     def extract_all(self, paginas):
 
@@ -90,6 +94,16 @@ class ExtractionPipeline:
                 regioes_graficos
             )
 
+            regiao_tiquete_custo = self.reader.get_page_region_words(
+                page_index=pagina + 2,
+                start_text="Tíquete Médio e Custo Per Capita",
+                end_text="Comparativo Despesas Assistenciais"
+            )
+
+            dados_tiquete_custo = self.ticket_cost_extractor.extract(
+                regiao_tiquete_custo
+            )
+
             dados_cadastrais.append(header)
 
             eventos_despesas.extend(
@@ -123,6 +137,13 @@ class ExtractionPipeline:
             indicadores_graficos.extend(
                 self.charts_transformer.transform(
                     dados_graficos,
+                    header
+                )
+            )
+
+            indicadores_graficos.extend(
+                self.ticket_cost_transformer.transform(
+                    dados_tiquete_custo,
                     header
                 )
             )
