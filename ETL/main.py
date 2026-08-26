@@ -1,8 +1,4 @@
-# BIBLIOTECAS
-import os
 import logging
-import pandas as pd
-
 from dotenv import load_dotenv
 
 from _readers.pdf_reader import PDFReader
@@ -12,43 +8,47 @@ from _utils.paths import build_paths
 from _utils.logging_config import setup_logging
 
 load_dotenv()
-setup_logging()
+LOG_FILE = setup_logging()
 
 logger = logging.getLogger(__name__)
+
 
 def main():
 
     try:
-        os.makedirs("ETL/logs", exist_ok=True)
-
         FILE_NAME, PDF_PATH, OUTPUT_PATH = build_paths(
             "FILE_NAME_2026T1_SC"
         )
 
-        logger.info(f"Processando arquivo: {FILE_NAME}")
+        logger.info(
+            "ETL iniciado | arquivo=%s | log=%s",
+            FILE_NAME,
+            LOG_FILE
+        )
 
         reader = PDFReader(PDF_PATH)
-        logger.info(f"Total de páginas no PDF: {reader.get_total_pages()}")
-
         paginas = reader.locate_pages()
-        logger.info(f"Total de páginas localizadas: {len(paginas)}")
 
         pipeline = ExtractionPipeline(reader)
-        logger.info("Iniciando extração de dados...")
-
         dados = pipeline.extract_all(paginas)
-        logger.info("Extração de dados concluída.")
 
+        logger.info("Exportação para Excel iniciada")
         dataframes = export_to_excel(dados, OUTPUT_PATH)
-        logger.info("Exportando para Excel...")
-
-        logger.info(f"Arquivo Excel gerado em: {OUTPUT_PATH}")
 
         for nome_aba, dataframe in dataframes.items():
-            logger.info(f"{nome_aba}: {len(dataframe)} registros")
+            logger.info(
+                "Conjunto processado | nome=%s | registros=%d",
+                nome_aba,
+                len(dataframe)
+            )
 
-    except Exception as e:
-        logger.exception(f"Erro durante a execução do ETL: {e}")
+        logger.info(
+            "ETL concluído com sucesso | arquivo_saida=%s",
+            OUTPUT_PATH
+        )
+
+    except Exception:
+        logger.exception("ETL finalizado com erro")
         raise
 
 if __name__ == "__main__":

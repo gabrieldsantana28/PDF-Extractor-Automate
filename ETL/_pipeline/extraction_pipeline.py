@@ -1,3 +1,5 @@
+import logging
+
 # EXTRACTORS
 from _extractors.charts import ChartsExtractor
 from _extractors.events import EventsExtractor
@@ -14,6 +16,10 @@ from _transformers.expenses import ExpensesTransformer
 from _transformers.hospitalizations import HospitalizationsTransformer
 from _transformers.indicators import IndicatorsTransformer
 from _transformers.ticket_cost import TicketCostTransformer
+
+
+logger = logging.getLogger(__name__)
+
 
 class ExtractionPipeline:
 
@@ -37,6 +43,11 @@ class ExtractionPipeline:
 
     def extract_all(self, paginas):
 
+        logger.info(
+            "Pipeline de extração iniciado | blocos_unimed=%d",
+            len(paginas)
+        )
+
         dados_cadastrais = []
         eventos_despesas = []
         indicadores_assistenciais = []
@@ -44,11 +55,26 @@ class ExtractionPipeline:
         despesas_assistenciais = []
         indicadores_graficos = []
 
-        for pagina in paginas:
+        for indice, pagina in enumerate(paginas, start=1):
+
+            logger.info(
+                "Processando bloco de Unimed | bloco=%d/%d | "
+                "pagina_inicial=%d",
+                indice,
+                len(paginas),
+                pagina
+            )
 
             texto = self.reader.get_page_text(pagina)
 
             header = self.header_extractor.extract(texto)
+
+            logger.info(
+                "Unimed identificada | codigo=%s | nome=%s | periodo=%s",
+                header["codigo_unimed"],
+                header["unimed"],
+                header["periodo"]
+            )
 
             dados_eventos = self.events_extractor.extract(texto)
             dados_indicadores = self.indicators_extractor.extract(texto)
@@ -148,7 +174,14 @@ class ExtractionPipeline:
                 )
             )
 
-        return {
+            logger.info(
+                "Bloco de Unimed concluído | codigo=%s | "
+                "pagina_inicial=%d",
+                header["codigo_unimed"],
+                pagina
+            )
+
+        resultado = {
             "dados_cadastrais": dados_cadastrais,
             "eventos_despesas": eventos_despesas,
             "indicadores_assistenciais": indicadores_assistenciais,
@@ -156,3 +189,12 @@ class ExtractionPipeline:
             "despesas_assistenciais": despesas_assistenciais,
             "indicadores_graficos": indicadores_graficos
         }
+
+        logger.info(
+            "Pipeline de extração concluído | blocos_processados=%d | "
+            "total_registros=%d",
+            len(dados_cadastrais),
+            sum(len(registros) for registros in resultado.values())
+        )
+
+        return resultado

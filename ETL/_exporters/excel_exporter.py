@@ -1,3 +1,4 @@
+import logging
 import os
 import pandas as pd
 from openpyxl.chart import BarChart, Reference
@@ -13,6 +14,8 @@ COR_SECUNDARIA = "00A859"
 COR_DESTAQUE = "D9EAD3"
 COR_FUNDO = "F4F7F6"
 COR_BORDA = "D9E2E1"
+
+logger = logging.getLogger(__name__)
 
 
 def _ultima_linha(dataframes, nome_aba):
@@ -117,6 +120,8 @@ def _adicionar_grafico(
 
 
 def _criar_resumo(writer, dataframes):
+
+    logger.debug("Criação da aba de resumo iniciada")
 
     workbook = writer.book
     worksheet = workbook.create_sheet("resumo", 0)
@@ -573,7 +578,15 @@ def _criar_resumo(writer, dataframes):
     workbook.calculation.fullCalcOnLoad = True
     workbook.calculation.forceFullCalc = True
 
+    logger.debug("Aba de resumo criada | graficos=8")
+
 def export_to_excel(dados, output_path):
+
+    logger.info(
+        "Geração do Excel iniciada | arquivo_saida=%s | abas_dados=%d",
+        output_path,
+        len(dados)
+    )
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -585,6 +598,11 @@ def export_to_excel(dados, output_path):
     with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
 
         for nome_aba, dataframe in dataframes.items():
+            logger.debug(
+                "Escrevendo aba | nome=%s | registros=%d",
+                nome_aba,
+                len(dataframe)
+            )
             dataframe.to_excel(
                 writer,
                 sheet_name=nome_aba,
@@ -626,5 +644,12 @@ def export_to_excel(dados, output_path):
                 ].width = largura
 
         _criar_resumo(writer, dataframes)
+
+    logger.info(
+        "Geração do Excel concluída | arquivo_saida=%s | "
+        "total_registros=%d",
+        output_path,
+        sum(len(dataframe) for dataframe in dataframes.values())
+    )
 
     return dataframes

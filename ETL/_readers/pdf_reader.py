@@ -1,4 +1,10 @@
+import logging
+import os
+
 import pdfplumber
+
+
+logger = logging.getLogger(__name__)
 
 
 class PDFReader:
@@ -6,21 +12,37 @@ class PDFReader:
     def __init__(self, pdf_path):
         self.pdf_path = pdf_path
 
+        logger.debug(
+            "Leitor de PDF criado | arquivo=%s",
+            os.path.basename(pdf_path)
+        )
+
+    def get_total_pages(self):
+
+        with pdfplumber.open(self.pdf_path) as pdf:
+            return len(pdf.pages)
+
     def locate_pages(self):
 
         paginas_unimed = []
 
-        with pdfplumber.open(self.pdf_path) as pdf:
+        logger.info(
+            "Localização de páginas iniciada | arquivo=%s",
+            os.path.basename(self.pdf_path)
+        )
 
-            print("=" * 30)
-            print(f"Total de páginas: {len(pdf.pages)}")
-            print("=" * 30)
+        with pdfplumber.open(self.pdf_path) as pdf:
+            logger.info("PDF aberto | total_paginas=%d", len(pdf.pages))
 
             for indice, pagina in enumerate(pdf.pages):
 
                 texto = pagina.extract_text()
 
                 if texto is None:
+                    logger.warning(
+                        "Página sem texto ignorada | pagina=%d",
+                        indice + 1
+                    )
                     continue
 
                 if (
@@ -28,14 +50,21 @@ class PDFReader:
                     or texto.startswith("RECA")
                 ):
                     paginas_unimed.append(indice + 1)
-
-                    print(
-                        f"Página {indice + 1} encontrada."
+                    logger.debug(
+                        "Página inicial de Unimed localizada | pagina=%d",
+                        indice + 1
                     )
+
+        logger.info(
+            "Localização de páginas concluída | blocos_unimed=%d",
+            len(paginas_unimed)
+        )
 
         return paginas_unimed
 
     def get_page_text(self, page_index):
+
+        logger.debug("Extraindo texto integral | pagina=%d", page_index)
 
         with pdfplumber.open(self.pdf_path) as pdf:
 
@@ -51,6 +80,13 @@ class PDFReader:
         padding=2,
         right_margin=20
     ):
+
+        logger.debug(
+            "Extraindo região de texto | pagina=%d | inicio=%s | fim=%s",
+            page_index,
+            start_text,
+            end_text
+        )
 
         with pdfplumber.open(self.pdf_path) as pdf:
 
@@ -112,6 +148,13 @@ class PDFReader:
         top_padding=2,
         bottom_padding=2
     ):
+
+        logger.debug(
+            "Extraindo palavras por região | pagina=%d | inicio=%s | fim=%s",
+            page_index,
+            start_text,
+            end_text
+        )
 
         with pdfplumber.open(self.pdf_path) as pdf:
 

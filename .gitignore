@@ -3,3 +3,6 @@ files/
 venv/
 tests/
 output/
+ETL/logs/
+__pycache__/
+*.py[cod]

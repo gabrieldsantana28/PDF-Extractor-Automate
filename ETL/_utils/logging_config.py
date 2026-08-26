@@ -4,6 +4,9 @@ from datetime import datetime
 
 
 def setup_logging():
+    log_level_name = os.getenv("LOG_LEVEL", "INFO").upper()
+    log_level = getattr(logging, log_level_name, logging.INFO)
+
     log_dir = os.path.abspath("ETL/logs")
     os.makedirs(log_dir, exist_ok=True)
 
@@ -13,7 +16,7 @@ def setup_logging():
     )
 
     logging.basicConfig(
-        level=logging.INFO,
+        level=log_level,
         format=(
             "%(asctime)s | "
             "%(levelname)s | "
@@ -28,3 +31,5 @@ def setup_logging():
             )
         ]
     )
+
+    return log_file
